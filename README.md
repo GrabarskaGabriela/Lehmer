@@ -1,0 +1,2 @@
+# Lehmer
+Algorytm Lehmera
