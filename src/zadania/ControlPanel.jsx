@@ -1,7 +1,6 @@
 export default function ControlPanel({ params, setParams, theme }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
-        // Konwersja na Number, aby uniknąć błędów w obliczeniach
         setParams((prev) => ({ ...prev, [name]: Number(value) }));
     };
 
