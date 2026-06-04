@@ -1,0 +1,554 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{mathptmx}
+\usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{2248}{$\approx$}
+\usepackage{polski}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{titlesec}
+\usepackage{ragged2e}
+
+\titleclass{\subsubsubsection}{straight}[\subsubsection]
+\newcounter{subsubsubsection}[subsubsection]
+\renewcommand\thesubsubsubsection{\thesubsubsection.\arabic{subsubsubsection}}
+\titleformat{\subsubsubsection}
+  {\normalfont\normalsize\bfseries}{\thesubsubsubsection}{1em}{}
+\titlespacing*{\subsubsubsection}{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\setcounter{tocdepth}{2}
+
+% ===== KOLORY KATEGORII =====
+\definecolor{colorDo}{RGB}{100,160,220}
+\definecolor{colorZnane}{RGB}{130,185,115}
+\definecolor{colorNon}{RGB}{225,105,55}
+\definecolor{colorPrzysz}{RGB}{165,100,150}
+\definecolor{colorDoLight}{RGB}{218,233,248}
+\definecolor{colorZnaneLight}{RGB}{220,238,210}
+\definecolor{colorNonLight}{RGB}{250,218,200}
+\definecolor{colorPrzyszLight}{RGB}{238,218,233}
+
+% ===== KOLORY TABEL =====
+\definecolor{headerBg}{RGB}{50,78,120}
+\definecolor{rowAlt}{RGB}{245,248,252}
+
+% ===== KOLORY LISTINGOW =====
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{backcolour},
+  commentstyle=\color{codegreen},
+  keywordstyle=\color{blue},
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\scriptsize,
+  breakatwhitespace=false, breaklines=true, captionpos=b,
+  keepspaces=true, numbersep=5pt,
+  showspaces=false, showstringspaces=false, showtabs=false, tabsize=2
+}
+\lstset{style=mystyle}
+
+% ===== MAKRA =====
+\newcommand{\THX}[1]{\cellcolor{headerBg}\color{white}\bfseries #1}
+\newcommand{\THXB}[1]{\cellcolor{headerBg}\color{white}\bfseries #1}
+\newcommand{\catbadge}[2]{\colorbox{#1}{\color{white}\bfseries\small\strut\;#2\;}}
+
+% ===== ZWARTA TYPOGRAFIA TABEL I LIST =====
+\setlength{\tabcolsep}{4pt}
+\setlength{\LTpre}{4pt}
+\setlength{\LTpost}{4pt}
+\renewcommand{\arraystretch}{0.9}
+\setlist[itemize]{topsep=2pt,itemsep=2pt,parsep=0pt,partopsep=0pt}
+
+\begin{document}
+
+% ======================== STRONA TYTULOWA ========================
+\begin{titlepage}
+  \begin{center}
+    \large
+    {\noindent Collegium Witelona Uczelnia Państwowa w Legnicy}\\
+    {\noindent Wydział Nauk Technicznych i Ekonomicznych}\\
+    {\noindent Kierunek: Informatyka}\\[2cm]
+    \includegraphics[width=5cm]{godlo.jpg}\\[2cm]
+    {\large\textbf{Projekt do kursu Podstawy Symulacji Komputerowej''}}\\[3cm]
+    {\large\textbf{Autor}}\\
+    Gabriela Grabarska, nr indeksu: 43840\\[2.5cm]
+  \end{center}
+  \begin{flushright}
+    \begin{tabular}{l}
+      Prowadzący przedmiot\\
+     dr inż. Ryszard Rębowski
+    \end{tabular}
+  \end{flushright}
+  \vfill
+  \begin{center}{\noindent Legnica, 2026}\end{center}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Wprowadzenie}
+
+Celem projektu jest opracowanie trzech tematów z list zadań z kursu Podstawy Symulacji Komputerowej. Projekt obejmuje część merytoryczną, implementację algorytmów oraz prezentację wyników końcowych w aplikacji komputerowej.
+
+W pracy przedstawiono podstawowe zagadnienia związane z symulacją komputerową, generowaniem liczb pseudolosowych oraz wykorzystaniem tych liczb do otrzymywania rozkładów prawdopodobieństwa. Projekt został przygotowany tak, aby połączyć opis teoretyczny z praktycznym działaniem algorytmów. Dla każdego wybranego zadania opisano podstawy merytoryczne, sposób implementacji oraz otrzymane wyniki.
+
+Pierwsza część projektu dotyczy analizy rozkładu łącznego dwuwymiarowego wektora losowego. W tej części obliczane są rozkłady brzegowe, wartości oczekiwane, kowariancja, współczynnik korelacji oraz sprawdzana jest niezależność stochastyczna i zależność liniowa zmiennych losowych.
+
+Druga część projektu dotyczy generowania liczb pseudolosowych. W aplikacji zaprezentowano dwa sposoby generowania takich liczb: liniowy generator kongruencyjny Lehmera oraz metodę środkowych kwadratów von Neumanna. Generator Lehmera został następnie wykorzystany jako źródło liczb jednostajnych w zadaniach symulacyjnych.
+
+Trzecia część projektu obejmuje generowanie rozkładów prawdopodobieństwa na podstawie liczb pseudolosowych. Dla rozkładu dyskretnego zaimplementowano generowanie rozkładu Poissona, natomiast dla rozkładu ciągłego zastosowano metodę odwracania dystrybuanty.
+
+Do realizacji projektu przygotowano aplikację webową. Część obliczeniowa została wydzielona do backendu w języku Python, natomiast część prezentacyjna została wykonana w React. Dzięki temu interfejs użytkownika służy do wprowadzania parametrów i prezentacji wyników, a właściwe obliczenia wykonywane są po stronie backendu.
+
+Wybrane tematy:
+\begin{enumerate}
+  \item Lista 0, zadanie 9 -- analiza rozkładu łącznego wektora losowego.
+  \item Lista 1, zadanie 8 -- generowanie rozkładu Poissona.
+  \item Lista 2, zadanie 2 -- generowanie rozkładu ciągłego metodą odwracania dystrybuanty.
+\end{enumerate}
+
+\section{Generator LCG Lehmera}
+
+W zadaniach z Listy 1 i Listy 2 wykorzystano generator kongruencyjny Lehmera jako źródło liczb pseudolosowych o rozkładzie jednostajnym na przedziale $[0,1)$. Wygenerowane wartości $U_j$ stanowią dane wejściowe dla algorytmu generowania rozkładu Poissona oraz dla metody odwracania dystrybuanty.
+
+Generator Lehmera tworzy ciąg liczb pseudolosowych według zależności:
+\begin{equation}
+  X_j = aX_{j-1} \pmod m,
+\end{equation}
+gdzie $X_0$ oznacza ziarno generatora, $a$ oznacza mnożnik, $m$ oznacza moduł, a $X_j$ oznacza kolejny stan generatora.
+
+Aby uzyskać liczby z przedziału $[0,1)$, każdy wygenerowany stan jest normalizowany:
+\begin{equation}
+  U_j = \frac{X_j}{m}.
+\end{equation}
+
+W aplikacji wartość modułu wyznaczana jest na podstawie zadanego okresu $k$:
+\begin{equation}
+  L = \operatorname{round}(\log_2(k) + 2),
+\end{equation}
+\begin{equation}
+  m = 2^L.
+\end{equation}
+
+Dla modułu postaci $m = 2^L$ warunki poprawnego doboru parametrów obejmują:
+\begin{itemize}
+  \item $L > 4$,
+  \item $k \geq 100$,
+  \item $a \bmod 8 \in \{3,5\}$,
+  \item $X_0$ jest liczbą nieparzystą.
+\end{itemize}
+
+W aplikacji jako domyślne parametry przyjęto:
+\begin{equation}
+  k = 536870912,\quad a = 1103515245,\quad X_0 = 12345,\quad n = 1200.
+\end{equation}
+
+Dla tych wartości otrzymujemy:
+\begin{equation}
+  L = 31,\quad m = 2^{31},\quad k = 2^{29} = 536870912.
+\end{equation}
+Mnożnik spełnia warunek $a \bmod 8 = 5$, a ziarno $X_0 = 12345$ jest nieparzyste.
+
+\subsection{Obserwacje i wnioski dotyczące doboru parametrów}
+
+Początkowo w aplikacji zastosowano parametry:
+\begin{equation}
+  k = 100,\quad a = 101,\quad X_0 = 3,\quad n = 900.
+\end{equation}
+Dla tych wartości generator spełniał podstawowe warunki z zadania, jednak na wykresach 2D i 3D widoczne były wyraźne linie oraz regularne układy punktów.
+
+Problem wynikał głównie z małego okresu generatora. Dla $k = 100$ otrzymywano:
+\begin{equation}
+  L = 9,\quad m = 2^9 = 512,\quad \text{okres} = 2^7 = 128.
+\end{equation}
+Jednocześnie liczba generowanych punktów wynosiła $n = 900$, czyli była znacznie większa niż okres generatora. W konsekwencji ciąg zaczynał się wielokrotnie powtarzać, a ta powtarzalność była widoczna na wykresach jako linie i regularne struktury.
+
+Po zgłębieniu tematu generatorów liniowych kongruencyjnych zauważono, że jakość generatora silnie zależy od doboru parametrów $a$, $m$ oraz $X_0$. Zbyt mały moduł lub niekorzystnie dobrany mnożnik może prowadzić do wyraźnej struktury kratowej punktów.
+
+W opracowaniu Karla Entachera \textit{A collection of selected pseudorandom number generators with linear structures} przedstawiono klasyczny generator używany w ANSI C:
+\begin{equation}
+  LCG(2^{31}, 1103515245, 12345, 12345).
+\end{equation}
+Na tej podstawie przyjęto większy moduł związany z wartością $m = 2^{31}$ oraz znany mnożnik $a = 1103515245$.
+
+W projekcie nie zastosowano dokładnie generatora ANSI C, ponieważ wzór z zadania dotyczy generatora multiplikatywnego Lehmera:
+\begin{equation}
+  X_j = aX_{j-1} \pmod m,
+\end{equation}
+a nie generatora mieszanego:
+\begin{equation}
+  X_j = aX_{j-1} + b \pmod m.
+\end{equation}
+Z przytoczonego przykładu wykorzystano więc ideę dużego modułu $2^{31}$ oraz znanego mnożnika $1103515245$, natomiast składnik addytywny nie został użyty.
+
+Aby w konstrukcji stosowanej w aplikacji uzyskać $m = 2^{31}$, dobrano:
+\begin{equation}
+  L = 31,\quad k = 2^{L-2} = 2^{29} = 536870912.
+\end{equation}
+Nowa liczba generowanych punktów jest bardzo mała w porównaniu z okresem generatora:
+\begin{equation}
+  1200 \ll 536870912.
+\end{equation}
+Dzięki temu ciąg nie powtarza się szybko, a punkty na wykresach 2D i 3D są znacznie lepiej rozproszone. Należy jednak pamiętać, że każdy generator LCG posiada pewną strukturę kratową, dlatego całkowite usunięcie zależności liniowych nie jest możliwe. Można jedynie dobrać parametry tak, aby przy analizowanej liczbie próbek struktura ta nie była widoczna na wykresach.
+
+\subsection{Fragment implementacji}
+
+\begin{lstlisting}[language=Python]
+@dataclass
+class LehmerGenerator:
+    seed: int
+    modulus: int
+    multiplier: int
+
+    def __post_init__(self) -> None:
+        self.current_x = int(self.seed or 1)
+        self.modulus = int(self.modulus)
+        self.multiplier = int(self.multiplier)
+
+    def next_int(self) -> int:
+        self.current_x = (self.multiplier * self.current_x) % self.modulus
+        return self.current_x
+
+    def next_float(self) -> float:
+        return self.next_int() / self.modulus
+\end{lstlisting}
+
+\section{Drugi sposób generowania liczb pseudolosowych: metoda von Neumanna}
+
+Oprócz generatora LCG Lehmera w aplikacji przedstawiono również algorytm kwadratowy von Neumanna, nazywany metodą środkowych kwadratów. Jest to jedna z historycznych metod generowania liczb pseudolosowych. Jej działanie polega na tym, że kolejną liczbę ciągu otrzymuje się przez podniesienie poprzedniej wartości do kwadratu, a następnie wybranie środkowych cyfr otrzymanego wyniku.
+
+Algorytm przyjmuje wartość początkową $X_0$ oraz liczbę cyfr $m$, która określa długość generowanych liczb. Dla każdego kroku:
+\begin{enumerate}
+  \item pobierana jest poprzednia wartość $X_{n-1}$,
+  \item obliczany jest kwadrat:
+  \begin{equation}
+    Y_n = X_{n-1}^2,
+  \end{equation}
+  \item wynik jest uzupełniany zerami z lewej strony tak, aby miał $2m$ cyfr,
+  \item ze środka zapisu liczby wybieranych jest $m$ cyfr,
+  \item otrzymana liczba staje się nową wartością $X_n$.
+\end{enumerate}
+
+Schemat można zapisać następująco:
+\begin{equation}
+  X_{n-1} \rightarrow X_{n-1}^2 \rightarrow \text{środkowe } m \text{ cyfr} \rightarrow X_n.
+\end{equation}
+
+Przykładowo dla $X_0 = 12$ oraz $m = 2$:
+\begin{align}
+  12^2 &= 144 \rightarrow 0144 \rightarrow 14,\\
+  14^2 &= 196 \rightarrow 0196 \rightarrow 19,\\
+  19^2 &= 361 \rightarrow 0361 \rightarrow 36.
+\end{align}
+
+Zaletą tej metody jest prostota i łatwość wizualnego pokazania kolejnych kroków obliczeń. W aplikacji każdy krok prezentowany jest osobno: wartość poprzednia, kwadrat, uzupełniony zapis, wyróżnione cyfry środkowe oraz nowa wartość ciągu. Należy jednak zauważyć, że generator von Neumanna ma istotne ograniczenia praktyczne. Dla niektórych wartości początkowych ciąg może szybko wejść w krótki cykl albo osiągnąć wartość $0$, po której dalsze generowanie daje stale $0$.
+
+\subsection{Fragment implementacji}
+
+\begin{lstlisting}[language=Python]
+def calculate_von_neumann(seed: int, digits: int, count: int) -> list[dict]:
+    current_x = int(seed)
+    results = []
+
+    for index in range(count):
+        square = current_x**2
+        square_text = str(square).zfill(2 * digits)
+        start = digits // 2
+        middle = square_text[start : start + digits]
+        value = int(middle)
+
+        results.append({
+            "prev": current_x,
+            "square": square,
+            "full": square_text,
+            "middle": middle,
+            "value": value,
+        })
+
+        current_x = value
+
+        if current_x == 0:
+            break
+
+    return results
+\end{lstlisting}
+
+\section{Lista 0, zadanie 9}
+
+\subsection{Treść zadania}
+
+Dana jest macierz $P$ reprezentująca rozkład łączny wektora losowego $(X,Y)$, gdzie:
+\begin{equation}
+P =
+\begin{bmatrix}
+0{,}1 & 0{,}2 & 0{,}3\\
+0{,}1 & 0{,}1 & 0{,}2
+\end{bmatrix},
+\end{equation}
+oraz:
+\begin{equation}
+  X(\Omega)=\{1,2\},\qquad Y(\Omega)=\{3,2,1\}.
+\end{equation}
+Należy obliczyć:
+\begin{itemize}
+  \item $\operatorname{cov}(X,Y)$,
+  \item $\rho(X,Y)$,
+  \item sprawdzić, czy zmienne losowe $X$ i $Y$ są stochastycznie niezależne,
+  \item sprawdzić, czy zmienne losowe $X$ i $Y$ są liniowo zależne.
+\end{itemize}
+
+\subsection{Podstawy merytoryczne i obliczenia}
+
+Rozkład łączny wektora losowego opisuje prawdopodobieństwa jednoczesnego przyjmowania wartości przez dwie zmienne losowe:
+\begin{equation}
+  p_{ij} = P(X=x_i,Y=y_j).
+\end{equation}
+
+Rozkłady brzegowe wyznacza się przez sumowanie odpowiednich wierszy i kolumn:
+\begin{align}
+  P(X=x_i) &= \sum_j p_{ij},\\
+  P(Y=y_j) &= \sum_i p_{ij}.
+\end{align}
+
+Dla danych z zadania:
+\begin{align}
+  P(X=1) &= 0{,}1 + 0{,}2 + 0{,}3 = 0{,}6,\\
+  P(X=2) &= 0{,}1 + 0{,}1 + 0{,}2 = 0{,}4,\\
+  P(Y=3) &= 0{,}1 + 0{,}1 = 0{,}2,\\
+  P(Y=2) &= 0{,}2 + 0{,}1 = 0{,}3,\\
+  P(Y=1) &= 0{,}3 + 0{,}2 = 0{,}5.
+\end{align}
+
+Wartości oczekiwane:
+\begin{align}
+  E(X) &= 1 \cdot 0{,}6 + 2 \cdot 0{,}4 = 1{,}4,\\
+  E(Y) &= 3 \cdot 0{,}2 + 2 \cdot 0{,}3 + 1 \cdot 0{,}5 = 1{,}7.
+\end{align}
+
+Dalej:
+\begin{align}
+E(XY) &= \sum_i \sum_j x_i y_j p_{ij}\\
+&= 1 \cdot 3 \cdot 0{,}1 + 1 \cdot 2 \cdot 0{,}2 + 1 \cdot 1 \cdot 0{,}3\\
+&\quad + 2 \cdot 3 \cdot 0{,}1 + 2 \cdot 2 \cdot 0{,}1 + 2 \cdot 1 \cdot 0{,}2\\
+&= 2{,}4.
+\end{align}
+
+Kowariancja:
+\begin{align}
+  \operatorname{cov}(X,Y) &= E(XY) - E(X)E(Y)\\
+  &= 2{,}4 - 1{,}4 \cdot 1{,}7\\
+  &= 0{,}02.
+\end{align}
+
+Wariancje:
+\begin{align}
+  E(X^2) &= 1^2 \cdot 0{,}6 + 2^2 \cdot 0{,}4 = 2{,}2,\\
+  \operatorname{Var}(X) &= 2{,}2 - 1{,}4^2 = 0{,}24,\\
+  E(Y^2) &= 3^2 \cdot 0{,}2 + 2^2 \cdot 0{,}3 + 1^2 \cdot 0{,}5 = 3{,}5,\\
+  \operatorname{Var}(Y) &= 3{,}5 - 1{,}7^2 = 0{,}61.
+\end{align}
+
+Współczynnik korelacji:
+\begin{align}
+  \rho(X,Y) &= \frac{\operatorname{cov}(X,Y)}{\sqrt{\operatorname{Var}(X)\operatorname{Var}(Y)}}\\
+  &= \frac{0{,}02}{\sqrt{0{,}24 \cdot 0{,}61}}\\
+  &\approx 0{,}0522.
+\end{align}
+
+Warunek niezależności stochastycznej:
+\begin{equation}
+  P(X=x_i,Y=y_j) = P(X=x_i)P(Y=y_j).
+\end{equation}
+Dla pary $(X=1,Y=3)$:
+\begin{align}
+  P(X=1,Y=3) &= 0{,}1,\\
+  P(X=1)P(Y=3) &= 0{,}6 \cdot 0{,}2 = 0{,}12.
+\end{align}
+Ponieważ $0{,}1 \neq 0{,}12$, zmienne losowe $X$ i $Y$ nie są stochastycznie niezależne.
+
+Zmienne nie są również liniowo zależne, ponieważ dla $X=1$ zmienna $Y$ może przyjmować kilka różnych wartości z dodatnim prawdopodobieństwem.
+
+\subsection{Fragment implementacji}
+
+\begin{lstlisting}[language=Python]
+expected_xy = 0.0
+for row_index, x in enumerate(x_values):
+    for column_index, y in enumerate(y_values):
+        expected_xy += x * y * probabilities[row_index][column_index]
+
+covariance = expected_xy - expected_x * expected_y
+rho = covariance / sqrt(variance_x * variance_y)
+\end{lstlisting}
+
+\section{Lista 1, zadanie 8}
+
+\subsection{Treść zadania}
+
+Zaprogramować algorytm generowania rozkładu Poissona. Przyjąć:
+\begin{equation}
+  \lambda = 2{,}0.
+\end{equation}
+W projekcie zadanie wykonano przez wygenerowanie ciągu liczb jednostajnych $U_i$ za pomocą generatora LCG Lehmera, a następnie przekształcenie ich do wartości zmiennej losowej o rozkładzie Poissona.
+
+\subsection{Podstawy merytoryczne}
+
+Rozkład Poissona jest rozkładem dyskretnym opisującym liczbę zdarzeń zachodzących w ustalonym przedziale czasu lub przestrzeni. Zmienna losowa $X$ ma rozkład Poissona z parametrem $\lambda$, jeżeli:
+\begin{equation}
+  P(X=k) = e^{-\lambda}\frac{\lambda^k}{k!},\qquad k=0,1,2,\ldots
+\end{equation}
+
+Dla wartości z zadania:
+\begin{equation}
+  P(X=k) = e^{-2}\frac{2^k}{k!},\qquad k=0,1,2,\ldots
+\end{equation}
+
+Dla rozkładu Poissona:
+\begin{equation}
+  E(X)=\lambda,\qquad \operatorname{Var}(X)=\lambda.
+\end{equation}
+Zatem dla $\lambda=2$:
+\begin{equation}
+  E(X)=2,\qquad \operatorname{Var}(X)=2.
+\end{equation}
+
+Do wygenerowania rozkładu wykorzystano metodę odwrotnej dystrybuanty dla rozkładu dyskretnego. Najpierw generowana jest liczba jednostajna $U$ z przedziału $[0,1)$, a następnie szukana jest najmniejsza liczba całkowita $k$, dla której:
+\begin{equation}
+  F(k) \geq U,
+\end{equation}
+gdzie:
+\begin{equation}
+  F(k)=P(X\leq k)=\sum_{i=0}^{k} e^{-\lambda}\frac{\lambda^i}{i!}.
+\end{equation}
+Dla $\lambda=2$:
+\begin{equation}
+  F(k)=\sum_{i=0}^{k} e^{-2}\frac{2^i}{i!}.
+\end{equation}
+
+\subsection{Algorytm}
+
+\begin{enumerate}
+  \item Wygenerować wartość $U$ algorytmem LCG Lehmera.
+  \item Ustawić $p_0=e^{-\lambda}$ oraz $F=p_0$.
+  \item Jeśli $U\leq F$, zwrócić wartość $0$.
+  \item W przeciwnym razie obliczać kolejne prawdopodobieństwa rekurencyjnie:
+  \begin{equation}
+    p_k = p_{k-1}\frac{\lambda}{k}.
+  \end{equation}
+  \item Sumować wartości do dystrybuanty $F$.
+  \item Zwrócić pierwsze $k$, dla którego $U\leq F$.
+\end{enumerate}
+
+Dla $\lambda=2$ rekurencja ma postać:
+\begin{equation}
+  p_0=e^{-2},\qquad p_k=p_{k-1}\frac{2}{k}.
+\end{equation}
+
+\subsection{Fragment implementacji}
+
+\begin{lstlisting}[language=Python]
+def _poisson_from_uniform(uniform_value: float, lambda_value: float) -> tuple[int, float]:
+    probability = exp(-lambda_value)
+    cumulative = probability
+    value = 0
+
+    while uniform_value > cumulative:
+        value += 1
+        probability *= lambda_value / value
+        cumulative += probability
+
+    return value, cumulative
+\end{lstlisting}
+
+\subsection{Wyniki końcowe}
+
+Aplikacja prezentuje wygenerowane wartości rozkładu Poissona, histogram częstości, średnią z próby, wariancję z próby oraz porównanie z wartościami teoretycznymi $E(X)=\lambda$ i $\operatorname{Var}(X)=\lambda$. Dla domyślnych parametrów $\lambda=2{,}0$ oczekuje się, że przy większej liczbie próbek średnia i wariancja z próby będą zbliżać się do wartości $2$.
+
+\section{Lista 2, zadanie 2}
+
+\subsection{Treść zadania}
+
+Zaimplementować metodologię metody odwracania dystrybuanty, wykorzystując wyniki Przykładu 1 z materiałów wykładowych.
+
+W projekcie jako przykład rozkładu ciągłego zastosowano rozkład wykładniczy z parametrem $\lambda$. Liczby jednostajne $U_i$ generowane są za pomocą generatora LCG Lehmera, a następnie podstawiane do funkcji odwrotnej dystrybuanty.
+
+\subsection{Podstawy merytoryczne}
+
+Metoda odwracania dystrybuanty służy do generowania wartości zmiennej losowej o zadanym rozkładzie ciągłym. Jeżeli $U$ ma rozkład jednostajny na przedziale $[0,1)$, a $F$ jest dystrybuantą wybranego rozkładu, to zmienna:
+\begin{equation}
+  X=F^{-1}(U)
+\end{equation}
+ma rozkład o dystrybuancie $F$.
+
+Ogólny schemat metody:
+\begin{equation}
+  U \sim U(0,1),\qquad X=F^{-1}(U).
+\end{equation}
+
+W aktualnej implementacji zastosowano rozkład wykładniczy z parametrem $\lambda$. Jego dystrybuanta ma postać:
+\begin{equation}
+F(x)=
+\begin{cases}
+0, & x<0,\\
+1-e^{-\lambda x}, & x\geq 0.
+\end{cases}
+\end{equation}
+
+Aby wyznaczyć funkcję odwrotną:
+\begin{align}
+  u &= 1-e^{-\lambda x},\\
+  e^{-\lambda x} &= 1-u,\\
+  -\lambda x &= \ln(1-u),\\
+  x &= -\frac{\ln(1-u)}{\lambda}.
+\end{align}
+
+Stąd:
+\begin{equation}
+  X=-\frac{\ln(1-U)}{\lambda}.
+\end{equation}
+
+\subsection{Algorytm}
+
+\begin{enumerate}
+  \item Wygenerować wartość $U$ algorytmem LCG Lehmera.
+  \item Podstawić $U$ do wzoru odwrotnej dystrybuanty.
+  \item Otrzymać wartość $X$ o rozkładzie wykładniczym.
+  \item Powtórzyć procedurę dla zadanej liczby próbek.
+\end{enumerate}
+
+\subsection{Fragment implementacji}
+
+\begin{lstlisting}[language=Python]
+uniform_value = min(max(generator.next_float(), 0.0), 0.999999999999)
+value = -log(1 - uniform_value) / safe_lambda
+\end{lstlisting}
+
+\subsection{Wyniki końcowe}
+
+Aplikacja prezentuje kolejne wartości $U_i$ z generatora LCG, wygenerowane wartości $X_i=F^{-1}(U_i)$, średnią z próby, wariancję z próby oraz wartości teoretyczne:
+\begin{equation}
+  E(X)=\frac{1}{\lambda},\qquad \operatorname{Var}(X)=\frac{1}{\lambda^2}.
+\end{equation}
+
+Jeżeli Przykład 1 z materiałów wykładowych definiuje inną dystrybuantę niż rozkład wykładniczy, należy podmienić wzór funkcji odwrotnej w części implementacyjnej.
+
+\section{Podsumowanie}
+
+W projekcie opracowano trzy zadania z list laboratoryjnych. Każde zadanie zawiera podstawy teoretyczne, implementację algorytmu oraz prezentację wyników. Wspólnym elementem zadań symulacyjnych jest generator LCG Lehmera, który dostarcza liczby pseudolosowe z przedziału $[0,1)$. Projekt spełnia wymaganie połączenia części merytorycznej z implementacją i wynikami końcowymi.
+
+\end{document}
