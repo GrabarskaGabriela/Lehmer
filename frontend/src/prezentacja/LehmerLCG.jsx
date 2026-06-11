@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { BlockMath, InlineMath } from 'react-katex';
 
 import { postJson } from '../api.js';
 import { Scene3D } from '../components/Scene3D.jsx';
 import { Scene2D } from '../components/Scene2D.jsx';
 import LehmerParamsPanel from '../components/LehmerParamsPanel.jsx';
 
-const initialData = {
+const danePoczatkowe = {
   lValue: 0,
   modulus: 0,
   actualPeriod: 0,
@@ -21,103 +20,118 @@ const initialData = {
   },
 };
 
-export default function Zadanie1({ params, setParams, theme }) {
-  const [data, setData] = useState(initialData);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+export default function AlgorytmLehmera({ params: parametry, setParams: ustawParametry, theme }) {
+  const [dane, ustawDane] = useState(danePoczatkowe);
+  const [czyLaduje, ustawCzyLaduje] = useState(true);
+  const [blad, ustawBlad] = useState('');
 
   useEffect(() => {
-    const controller = new AbortController();
+    const kontroler = new AbortController();
 
-    async function loadData() {
-      setIsLoading(true);
-      setError('');
+    async function zaladujDane() {
+      ustawCzyLaduje(true);
+      ustawBlad('');
 
       try {
-        const result = await postJson('/api/lehmer', params, controller.signal);
-        setData(result);
-      } catch (requestError) {
-        if (requestError.name !== 'AbortError') {
-          setError('Nie można pobrać wyników z backendu Python.');
+        const wynik = await postJson('/api/lehmer', parametry, kontroler.signal);
+        ustawDane(wynik);
+        console.log('[Lehmer] Parametry i wyniki', {
+          parametry,
+          liczbaWartosci: wynik.sequence.length,
+          srednia: wynik.stats.mean,
+          wariancja: wynik.stats.variance,
+          dane: wynik,
+        });
+      } catch (bladZapytania) {
+        if (bladZapytania.name !== 'AbortError') {
+          ustawBlad('Nie mozna pobrac wynikow z backendu Python.');
         }
       } finally {
-        setIsLoading(false);
+        ustawCzyLaduje(false);
       }
     }
 
-    loadData();
+    zaladujDane();
 
-    return () => controller.abort();
-  }, [params]);
+    return () => kontroler.abort();
+  }, [parametry]);
 
-  const getValidationColor = (value, target, tolerance) =>
-    Math.abs(value - target) < tolerance ? '#16a34a' : '#dc2626';
+  const kolorWalidacji = (wartosc, cel, tolerancja) =>
+    Math.abs(wartosc - cel) < tolerancja ? '#16a34a' : '#dc2626';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <LehmerParamsPanel params={params} setParams={setParams} theme={theme} />
+      <LehmerParamsPanel parametry={parametry} ustawParametry={ustawParametry} theme={theme} />
 
-      {error && <div style={errorStyle}>{error}</div>}
-      {isLoading && <div style={loadingStyle}>Liczenie w backendzie Python...</div>}
-
+      {blad && <div style={errorStyle}>{blad}</div>}
+      {czyLaduje && <div style={loadingStyle}>Liczenie w backendzie Python...</div>}
       <section style={cardStyle(theme)}>
-        <h3 style={{ marginTop: 0, color: theme.header }}>
-          Zadanie 1: Parametry konstrukcyjne LCG
+        <h3 style={{ marginTop: 0, marginBottom: 20, color: theme.header }}>
+          Parametry konstrukcyjne LCG
         </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-          <div style={formulaStyle}>
-            <p>
-              <strong>Wzory konstrukcyjne:</strong>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+          <div
+            style={{
+              background: theme.background ?? '#f9f9f9',
+              borderRadius: 10,
+              padding: '16px 20px',
+              border: `1px solid ${theme.border ?? '#e0e0e0'}`,
+            }}
+          >
+            <p style={{ margin: '0 0 12px 0', fontWeight: 600, fontSize: 14, color: theme.header }}>
+              Wyniki parametrow
             </p>
-            <BlockMath math="m = 2^L" />
-            <BlockMath math="k = 2^{L-2}" />
-            <BlockMath math="x_j = (a \cdot x_{j-1}) \pmod{m}" />
-            <BlockMath math="r_j = x_j / m" />
+            <div style={{ fontSize: 16, lineHeight: 2 }}>
+              <div>
+                <em>L</em> = {dane.lValue}
+              </div>
+              <div>
+                <em>m</em> = {dane.modulus}
+              </div>
+            </div>
           </div>
 
-          <div style={formulaStyle}>
-            <p>
-              <strong>Wyniki parametrów:</strong>
+          <div
+            style={{
+              background: theme.background ?? '#f9f9f9',
+              borderRadius: 10,
+              padding: '16px 20px',
+              border: `1px solid ${theme.border ?? '#e0e0e0'}`,
+            }}
+          >
+            <p style={{ margin: '0 0 12px 0', fontWeight: 600, fontSize: 14, color: theme.header }}>
+              Weryfikacja warunkow
             </p>
-            <div style={{ marginBottom: '15px', fontSize: '16px', lineHeight: '1.8' }}>
-              <InlineMath math={`L = ${data.lValue}`} /> <br />
-              <InlineMath math={`m = ${data.modulus}`} /> <br />
-              <InlineMath math={`k = ${data.actualPeriod}`} />
-            </div>
-
-            <p
+            <ul
               style={{
-                fontSize: '13px',
-                fontWeight: 'bold',
-                borderTop: '1px solid #ddd',
-                paddingTop: '5px',
-                marginBottom: '8px',
+                listStyle: 'none',
+                padding: 0,
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
               }}
             >
-              Weryfikacja warunków:
-            </p>
-            <ul style={{ fontSize: '12px', listStyle: 'none', padding: 0, margin: 0 }}>
-              <ValidationItem valid={data.validations.lGreaterThanFour} label="L > 4" />
-              <ValidationItem valid={data.validations.periodAtLeastHundred} label="k >= 100" />
-              <ValidationItem valid={data.validations.multiplierModulo} label="a mod 8 in {3, 5}" />
-              <ValidationItem valid={data.validations.seedOdd} label="X0 jest nieparzyste" />
+              <ValidationItem valid={dane.validations.lGreaterThanFour} label="L > 4" />
+              <ValidationItem valid={dane.validations.periodAtLeastHundred} label="k >= 100" />
+              <ValidationItem valid={dane.validations.multiplierModulo} label="a mod 8 in {3, 5}" />
+              <ValidationItem valid={dane.validations.seedOdd} label="X0 jest nieparzyste" />
             </ul>
           </div>
         </div>
       </section>
 
       <section style={cardStyle(theme)}>
-        <h3 style={{ marginTop: 0 }}>Weryfikacja niezależności (2D i 3D)</h3>
+        <h3 style={{ marginTop: 0 }}>Weryfikacja niezaleznosci</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
           <div style={canvasBoxStyle}>
             <Canvas camera={{ position: [7, 7, 7] }}>
-              <Scene3D vals={data.sequence} />
+              <Scene3D vals={dane.sequence} />
             </Canvas>
-            <div style={labelOverlay}>Widok 3D (x, y, z)</div>
           </div>
           <div style={canvasBoxStyle}>
-            <Scene2D vals={data.sequence} width={380} height={380} />
-            <div style={labelOverlay}>Widok 2D (x, y)</div>
+            <Scene2D vals={dane.sequence} width={400} height={400} />
           </div>
         </div>
       </section>
@@ -127,35 +141,31 @@ export default function Zadanie1({ params, setParams, theme }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
           <div style={{ ...formulaStyle, textAlign: 'center' }}>
             <p>
-              <strong>
-                Średnia arytmetyczna (<InlineMath math="\bar{X}" />)
-              </strong>
+              <strong>Srednia arytmetyczna</strong>
             </p>
             <div
               style={{
                 fontSize: '24px',
                 fontWeight: 'bold',
-                color: getValidationColor(data.stats.mean, 0.5, 0.05),
+                color: kolorWalidacji(dane.stats.mean, 0.5, 0.05),
               }}
             >
-              {data.stats.mean.toFixed(5)}
+              {dane.stats.mean.toFixed(5)}
             </div>
             <small>Cel: 0.5000</small>
           </div>
           <div style={{ ...formulaStyle, textAlign: 'center' }}>
             <p>
-              <strong>
-                Wariancja (<InlineMath math="S^2" />)
-              </strong>
+              <strong>Wariancja</strong>
             </p>
             <div
               style={{
                 fontSize: '24px',
                 fontWeight: 'bold',
-                color: getValidationColor(data.stats.variance, 0.0833, 0.01),
+                color: kolorWalidacji(dane.stats.variance, 0.0833, 0.01),
               }}
             >
-              {data.stats.variance.toFixed(5)}
+              {dane.stats.variance.toFixed(5)}
             </div>
             <small>Cel: 0.0833 (1/12)</small>
           </div>
@@ -164,18 +174,18 @@ export default function Zadanie1({ params, setParams, theme }) {
 
       <section style={cardStyle(theme)}>
         <h3 style={{ marginTop: 0 }}>
-          Pełny ciąg wygenerowanych elementów
+          Wygenerowany ciag
           <span
-            style={{ marginLeft: 10, fontSize: '13px', fontWeight: 'normal', color: theme.muted }}
+            style={{ marginLeft: 10, fontSize: '13px', fontWeight: 'normal', color: theme.background }}
           >
-            (n = {data.sequence.length})
+            (n = {dane.sequence.length})
           </span>
         </h3>
         <div style={listContainerStyle}>
-          {data.sequence.map((val, idx) => (
-            <div key={idx} style={listItemStyle}>
-              <span style={{ color: '#94a3b8', fontSize: '10px' }}>[{idx}]</span>
-              <span style={{ fontWeight: '500', color: '#f8fafc' }}>{val.toFixed(6)}</span>
+          {dane.sequence.map((wartosc, indeks) => (
+            <div key={indeks} style={listItemStyle}>
+              <span style={{ color: '#000000', fontSize: '10px' }}>[{indeks}]</span>
+              <span style={{ fontWeight: '500', color: '#000000' }}>{wartosc.toFixed(6)}</span>
             </div>
           ))}
         </div>
@@ -220,23 +230,12 @@ const canvasBoxStyle = {
   position: 'relative',
 };
 
-const labelOverlay = {
-  position: 'absolute',
-  bottom: 10,
-  right: 10,
-  fontSize: '10px',
-  background: 'rgb(0 0 0 / 0.8)',
-  padding: '2px 6px',
-  borderRadius: '4px',
-  color: '#64748b',
-};
-
 const listContainerStyle = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
   gap: '6px',
   padding: '15px',
-  background: '#6e838d',
+  background: '#f6f8fa',
   borderRadius: '8px',
   fontFamily: 'monospace',
 };

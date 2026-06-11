@@ -16,6 +16,7 @@ const danePoczatkowe = {
   varianceX: 0,
   varianceY: 0,
   rho: 0,
+  independenceComparisons: [],
   isIndependent: false,
   isLinearlyDependent: false,
 };
@@ -62,17 +63,10 @@ export default function Zadanie9({ theme }) {
 
       <section style={cardStyle(theme)}>
         <h2 style={{ ...titleStyle, color: theme.header }}>Zadanie 9</h2>
-        <div style={taskBoxStyle}>
-          <p>Dana jest macierz P reprezentująca rozkład łączny wektora losowego (X, Y):</p>
-          <pre style={matrixStyle}>{`P = [ 0,1   0,2   0,3 ]\n    [ 0,1   0,1   0,2 ]`}</pre>
-          <p>X(Omega) = {'{1, 2}'}</p>
-          <p>Y(Omega) = {'{3, 2, 1}'}</p>
-          <p>Obliczyć: cov(X,Y), rho(X,Y), niezależność stochastyczną i zależność liniową.</p>
-        </div>
       </section>
 
       <section style={cardStyle(theme)}>
-        <h3 style={sectionTitleStyle}>Dane wspólne. Rozkłady brzegowe</h3>
+        <h3 style={sectionTitleStyle}>Rozkłady brzegowe</h3>
 
         <div style={{ overflowX: 'auto' }}>
           <table style={tableStyle}>
@@ -126,11 +120,15 @@ export default function Zadanie9({ theme }) {
       </section>
 
       <section style={cardStyle(theme)}>
-        <h3 style={sectionTitleStyle}>Dane wspólne. Wartości oczekiwane</h3>
+        <h3 style={sectionTitleStyle}>Wartości oczekiwane</h3>
 
         <div style={gridThreeStyle}>
-          <div style={calcBoxStyle}>E(X) = 1 * 0,6 + 2 * 0,4 = {formatujLiczbe(dane.expectedX, 1)}</div>
-          <div style={calcBoxStyle}>E(Y) = 3 * 0,2 + 2 * 0,3 + 1 * 0,5 = {formatujLiczbe(dane.expectedY, 1)}</div>
+          <div style={calcBoxStyle}>
+            E(X) = 1 * 0,6 + 2 * 0,4 = {formatujLiczbe(dane.expectedX, 1)}
+          </div>
+          <div style={calcBoxStyle}>
+            E(Y) = 3 * 0,2 + 2 * 0,3 + 1 * 0,5 = {formatujLiczbe(dane.expectedY, 1)}
+          </div>
           <div style={calcBoxStyle}>E(XY) = {formatujLiczbe(dane.expectedXY, 1)}</div>
         </div>
 
@@ -161,7 +159,9 @@ export default function Zadanie9({ theme }) {
             <div>Var(X) = 2,2 - 1,4^2 = {formatujLiczbe(dane.varianceX, 2)}</div>
           </div>
           <div style={calcBoxStyle}>
-            <div>E(Y^2) = 3^2 * 0,2 + 2^2 * 0,3 + 1^2 * 0,5 = {formatujLiczbe(dane.expectedY2, 1)}</div>
+            <div>
+              E(Y^2) = 3^2 * 0,2 + 2^2 * 0,3 + 1^2 * 0,5 = {formatujLiczbe(dane.expectedY2, 1)}
+            </div>
             <div>Var(Y) = 3,5 - 1,7^2 = {formatujLiczbe(dane.varianceY, 2)}</div>
           </div>
         </div>
@@ -180,9 +180,41 @@ export default function Zadanie9({ theme }) {
 
         <div style={calcBoxStyle}>
           <div>Warunek: p_ij = p_i * p_j</div>
-          <div>P(X=1, Y=3) = 0,1</div>
-          <div>P(X=1)P(Y=3) = 0,6 * 0,2 = 0,12</div>
-          <div>0,1 != 0,12</div>
+        </div>
+
+        <div style={{ overflowX: 'auto', marginBottom: 16 }}>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={cellStyle}>Para</th>
+                <th style={cellStyle}>p_ij</th>
+                <th style={cellStyle}>p_i</th>
+                <th style={cellStyle}>p_j</th>
+                <th style={cellStyle}>p_i * p_j</th>
+                <th style={cellStyle}>Porownanie</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dane.independenceComparisons.map((porownanie) => (
+                <tr key={`${porownanie.x}-${porownanie.y}`}>
+                  <td style={cellStyle}>
+                    X={porownanie.x}, Y={porownanie.y}
+                  </td>
+                  <td style={cellStyle}>{formatujLiczbe(porownanie.jointProbability, 2)}</td>
+                  <td style={cellStyle}>{formatujLiczbe(porownanie.px, 2)}</td>
+                  <td style={cellStyle}>{formatujLiczbe(porownanie.py, 2)}</td>
+                  <td style={cellStyle}>
+                    {formatujLiczbe(porownanie.px, 2)} * {formatujLiczbe(porownanie.py, 2)} ={' '}
+                    {formatujLiczbe(porownanie.product, 2)}
+                  </td>
+                  <td style={porownanie.isEqual ? goodCellStyle : badCellStyle}>
+                    {formatujLiczbe(porownanie.jointProbability, 2)}{' '}
+                    {porownanie.isEqual ? '=' : '!='} {formatujLiczbe(porownanie.product, 2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         <div style={dane.isIndependent ? answerStyle : badAnswerStyle}>{opisNiezaleznosci}</div>
@@ -197,7 +229,9 @@ export default function Zadanie9({ theme }) {
           <div>P(1,3) &gt; 0, P(1,2) &gt; 0, P(1,1) &gt; 0</div>
         </div>
 
-        <div style={dane.isLinearlyDependent ? answerStyle : badAnswerStyle}>{opisZaleznosciLiniowej}</div>
+        <div style={dane.isLinearlyDependent ? answerStyle : badAnswerStyle}>
+          {opisZaleznosciLiniowej}
+        </div>
       </section>
     </div>
   );
@@ -225,23 +259,6 @@ const titleStyle = {
 const sectionTitleStyle = {
   marginTop: 0,
   marginBottom: 14,
-};
-
-const taskBoxStyle = {
-  background: '#f8fafc',
-  border: '1px solid #e2e8f0',
-  borderRadius: 8,
-  padding: 16,
-  lineHeight: 1.7,
-};
-
-const matrixStyle = {
-  background: '#ffffff',
-  border: '1px solid #cbd5e1',
-  borderRadius: 8,
-  padding: 12,
-  fontSize: 16,
-  overflowX: 'auto',
 };
 
 const calcBoxStyle = {
@@ -301,4 +318,18 @@ const highlightCellStyle = {
   ...cellStyle,
   fontWeight: 700,
   background: '#f0f9ff',
+};
+
+const goodCellStyle = {
+  ...cellStyle,
+  fontWeight: 700,
+  color: '#166534',
+  background: '#ecfdf5',
+};
+
+const badCellStyle = {
+  ...cellStyle,
+  fontWeight: 700,
+  color: '#991b1b',
+  background: '#fef2f2',
 };

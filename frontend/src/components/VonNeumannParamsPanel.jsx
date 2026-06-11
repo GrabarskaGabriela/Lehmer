@@ -1,33 +1,33 @@
 import { useState } from 'react';
 
 export default function VonNeumannParamsPanel({
-  seed,
-  setSeed,
-  mDigits,
-  setMDigits,
-  count,
-  setCount,
+  X0,
+  ustawX0,
+  m,
+  ustawM,
+  n,
+  ustawN,
   theme,
 }) {
-  const [draft, setDraft] = useState({
-    seed,
-    mDigits,
-    count,
+  const [szkic, ustawSzkic] = useState({
+    X0,
+    m,
+    n,
   });
 
-  const handleChange = (e) => {
+  const obsluzZmiane = (e) => {
     const { name, value } = e.target;
 
-    setDraft((prev) => ({
-      ...prev,
+    ustawSzkic((poprzedni) => ({
+      ...poprzedni,
       [name]: Number(value),
     }));
   };
 
-  const handleApply = () => {
-    setSeed(draft.seed);
-    setMDigits(draft.mDigits);
-    setCount(draft.count);
+  const zastosujParametry = () => {
+    ustawX0(szkic.X0);
+    ustawM(szkic.m);
+    ustawN(szkic.n);
   };
 
   const fieldStyle = {
@@ -103,16 +103,6 @@ export default function VonNeumannParamsPanel({
           >
             Parametry generatora von Neumanna
           </div>
-
-          <div
-            style={{
-              fontSize: 12,
-              color: theme.muted,
-              marginTop: 3,
-            }}
-          >
-            Metoda środkowych kwadratów
-          </div>
         </div>
 
         <div
@@ -127,16 +117,21 @@ export default function VonNeumannParamsPanel({
             <label style={labelStyle}>X₀</label>
             <input
               type="number"
-              name="seed"
-              value={draft.seed}
-              onChange={handleChange}
+              name="X0"
+              value={szkic.X0}
+              onChange={obsluzZmiane}
               style={inputStyle}
             />
           </div>
 
           <div style={fieldStyle}>
-            <label style={labelStyle}>Liczba cyfr</label>
-            <select name="mDigits" value={draft.mDigits} onChange={handleChange} style={inputStyle}>
+            <label style={labelStyle}>m</label>
+            <select
+              name="m"
+              value={szkic.m}
+              onChange={obsluzZmiane}
+              style={inputStyle}
+            >
               <option value={2}>2</option>
               <option value={4}>4</option>
               <option value={6}>6</option>
@@ -149,15 +144,15 @@ export default function VonNeumannParamsPanel({
             <label style={labelStyle}>n</label>
             <input
               type="number"
-              name="count"
-              value={draft.count}
-              onChange={handleChange}
+              name="n"
+              value={szkic.n}
+              onChange={obsluzZmiane}
               style={inputStyle}
             />
           </div>
 
-          <button style={buttonStyle} onClick={handleApply}>
-            ▶ Generuj
+          <button style={buttonStyle} onClick={zastosujParametry}>
+            Generuj ciąg
           </button>
         </div>
       </div>

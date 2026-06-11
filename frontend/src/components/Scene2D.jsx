@@ -43,10 +43,15 @@ export function Scene2D({ vals, width = 400, height = 400 }) {
     ctx.lineTo(p, p - 10);
     ctx.stroke();
 
+    const paryPunktow = vals.slice(0, -1).map((wartosc, indeks) => ({
+      x: wartosc,
+      y: vals[indeks + 1],
+    }));
+
     ctx.fillStyle = '#2563eb';
-    for (let i = 0; i < vals.length - 1; i++) {
-      const x = p + vals[i] * innerW;
-      const y = p + (1 - vals[i + 1]) * innerH;
+    for (const punkt of paryPunktow) {
+      const x = p + punkt.x * innerW;
+      const y = p + (1 - punkt.y) * innerH;
 
       ctx.beginPath();
       ctx.arc(x, y, 1.5, 0, Math.PI * 2);
@@ -77,9 +82,6 @@ export function Scene2D({ vals, width = 400, height = 400 }) {
           background: 'white',
         }}
       />
-      <p style={{ fontSize: '12px', color: '#64748b', marginTop: '12px', fontWeight: '600' }}>
-        Korelacja par: (r<sub>i</sub>, r<sub>i+1</sub>)
-      </p>
     </div>
   );
 }

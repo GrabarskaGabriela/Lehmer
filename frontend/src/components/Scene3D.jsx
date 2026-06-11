@@ -8,7 +8,7 @@ export function Scene3D({ vals }) {
     if (!vals || vals.length < 3) return new Float32Array(0);
 
     const coords = [];
-    for (let i = 0; i < vals.length - 2; i += 3) {
+    for (let i = 0; i < vals.length - 2; i++) {
       coords.push(vals[i] * SCALE, vals[i + 1] * SCALE, vals[i + 2] * SCALE);
     }
     return new Float32Array(coords);

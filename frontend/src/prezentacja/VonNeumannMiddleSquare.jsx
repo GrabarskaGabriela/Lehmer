@@ -2,51 +2,59 @@ import { useEffect, useState } from 'react';
 import { postJson } from '../api.js';
 import VonNeumannParamsPanel from '../components/VonNeumannParamsPanel.jsx';
 
-export default function Zadanie2({ theme }) {
-  const [seed, setSeed] = useState(12);
-  const [mDigits, setMDigits] = useState(2);
-  const [count, setCount] = useState(100);
-  const [steps, setSteps] = useState([]);
-  const [error, setError] = useState('');
+export default function AlgorytmVonNeumanna({ theme }) {
+  const [X0, ustawX0] = useState(12);
+  const [m, ustawM] = useState(2);
+  const [n, ustawN] = useState(100);
+  const [kroki, ustawKroki] = useState([]);
+  const [blad, ustawBlad] = useState('');
 
   useEffect(() => {
     const controller = new AbortController();
 
-    async function loadSteps() {
-      setError('');
+    async function zaladujKroki() {
+      ustawBlad('');
 
       try {
-        const result = await postJson(
+        const wynik = await postJson(
           '/api/von-neumann',
-          { seed, digits: mDigits, count },
+          { seed: X0, digits: m, count: n },
           controller.signal,
         );
-        setSteps(result.steps);
-      } catch (requestError) {
-        if (requestError.name !== 'AbortError') {
-          setError('Nie można pobrać wyników z backendu Python.');
+        ustawKroki(wynik.steps);
+
+        console.log('[von Neumann] Parametry i wyniki', {
+          X0,
+          m,
+          n,
+          liczbaWygenerowanychKrokow: wynik.steps.length,
+          kroki: wynik.steps,
+        });
+      } catch (bladZapytania) {
+        if (bladZapytania.name !== 'AbortError') {
+          ustawBlad('Nie można pobrać wyników z backendu Python.');
         }
       }
     }
 
-    loadSteps();
+    zaladujKroki();
 
     return () => controller.abort();
-  }, [seed, mDigits, count]);
+  }, [X0, m, n]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <VonNeumannParamsPanel
-        seed={seed}
-        setSeed={setSeed}
-        mDigits={mDigits}
-        setMDigits={setMDigits}
-        count={count}
-        setCount={setCount}
+        X0={X0}
+        ustawX0={ustawX0}
+        m={m}
+        ustawM={ustawM}
+        n={n}
+        ustawN={ustawN}
         theme={theme}
       />
 
-      {error && <div style={errorStyle}>{error}</div>}
+      {blad && <div style={errorStyle}>{blad}</div>}
 
       <section
         style={{
@@ -74,7 +82,7 @@ export default function Zadanie2({ theme }) {
             marginBottom: 20,
           }}
         >
-          Metoda środkowych kwadratów
+          Metoda środka kwadratu
         </p>
 
         <h3
@@ -94,7 +102,7 @@ export default function Zadanie2({ theme }) {
             marginBottom: '30px',
           }}
         >
-          {steps.map((step, i) => (
+          {kroki.map((krok, i) => (
             <div
               key={i}
               style={{
@@ -109,7 +117,7 @@ export default function Zadanie2({ theme }) {
             >
               <small style={{ color: '#64748b' }}>X{i + 1}</small>
               <br />
-              <strong>{step.value}</strong>
+              <strong>{krok.value}</strong>
             </div>
           ))}
         </div>
@@ -120,7 +128,7 @@ export default function Zadanie2({ theme }) {
             marginBottom: '15px',
           }}
         >
-          Szczegółowa wizualizacja obliczeń
+          Obliczenia
         </h3>
 
         <div
@@ -130,7 +138,7 @@ export default function Zadanie2({ theme }) {
             gap: '10px',
           }}
         >
-          {steps.map((step, i) => (
+          {kroki.map((krok, i) => (
             <div
               key={i}
               style={{
@@ -163,11 +171,11 @@ export default function Zadanie2({ theme }) {
                 }}
               >
                 <span>
-                  {step.prev}^2 = {step.square}
+                  {krok.prev}^2 = {krok.square}
                 </span>
 
                 <div style={{ fontSize: '16px' }}>
-                  <span style={{ color: '#94a3b8' }}>{step.prefix}</span>
+                  <span style={{ color: '#94a3b8' }}>{krok.prefix}</span>
 
                   <span
                     style={{
@@ -178,10 +186,10 @@ export default function Zadanie2({ theme }) {
                       background: 'rgba(37,99,235,0.05)',
                     }}
                   >
-                    {step.middle}
+                    {krok.middle}
                   </span>
 
-                  <span style={{ color: '#94a3b8' }}>{step.suffix}</span>
+                  <span style={{ color: '#94a3b8' }}>{krok.suffix}</span>
                 </div>
 
                 <div
@@ -189,14 +197,14 @@ export default function Zadanie2({ theme }) {
                     fontWeight: 'bold',
                   }}
                 >
-                  -&gt; {step.value}
+                  -&gt; {krok.value}
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {steps.length > 0 && steps[steps.length - 1].value === 0 && (
+        {kroki.length > 0 && kroki[kroki.length - 1].value === 0 && (
           <div
             style={{
               marginTop: '20px',

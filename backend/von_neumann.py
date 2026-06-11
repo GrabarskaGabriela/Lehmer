@@ -1,35 +1,73 @@
 from __future__ import annotations
 
+def von_neumann(ziarno: int, m: int, n: int) -> list[dict]:
+    wybrane_m = max(1, int(m))
+    n = max(0, int(n))
+    aktualne_x = int(ziarno)
+    wyniki = []
 
-def calculate_von_neumann(seed: int, digits: int, count: int) -> list[dict]:
-    safe_digits = max(1, int(digits))
-    safe_count = max(0, int(count))
-    current_x = int(seed)
-    results = []
+    for indeks in range(n):
+        kwadrat = aktualne_x**2
+        zapis_kwadratu = str(kwadrat).zfill(2 * wybrane_m)
+        poczatek = wybrane_m // 2
+        srodek = zapis_kwadratu[poczatek : poczatek + wybrane_m]
+        wartosc = int(srodek)
 
-    for index in range(safe_count):
-        square = current_x**2
-        square_text = str(square).zfill(2 * safe_digits)
-        start = safe_digits // 2
-        middle = square_text[start : start + safe_digits]
-        value = int(middle)
-
-        results.append(
+        wyniki.append(
             {
-                "index": index + 1,
-                "prev": current_x,
-                "square": square,
-                "full": square_text,
-                "prefix": square_text[:start],
-                "middle": middle,
-                "suffix": square_text[start + safe_digits :],
-                "value": value,
+                "index": indeks + 1,
+                "prev": aktualne_x,
+                "square": kwadrat,
+                "full": zapis_kwadratu,
+                "prefix": zapis_kwadratu[:poczatek],
+                "middle": srodek,
+                "suffix": zapis_kwadratu[poczatek + wybrane_m :],
+                "value": wartosc,
             }
         )
 
-        current_x = value
+        aktualne_x = wartosc
 
-        if current_x == 0:
+        if aktualne_x == 0:
             break
 
-    return results
+    def von_neumann_konsola(
+            ziarno: int,
+            m: int,
+            n: int,
+            kroki: list[dict],
+    ) -> None:
+        print("\nGenerator von Neumanna - metoda srodkowych kwadratow", flush=True)
+        print("Parametry generatora:", flush=True)
+        print(f"X0 = {ziarno}", flush=True)
+        print(f"m = {m}", flush=True)
+        print(f"n = {n}", flush=True)
+
+        print("\nObliczenia:", flush=True)
+        for krok in kroki[:10]:
+            print(
+                "i = "
+                + str(krok["index"])
+                + ", X_i = "
+                + str(krok["prev"])
+                + ", X_i^2 = "
+                + str(krok["square"])
+                + ", zapis = "
+                + str(krok["full"])
+                + ", srodek = "
+                + str(krok["middle"])
+                + ", X_(i+1) = "
+                + str(krok["value"]),
+                flush=True,
+            )
+
+        if kroki and kroki[-1]["value"] == 0:
+            print("\nGenerator osiagnal stan 0 i zostal zatrzymany.", flush=True)
+
+    von_neumann_konsola(
+        int(ziarno),
+        wybrane_m,
+        n,
+        wyniki,
+    )
+    return wyniki

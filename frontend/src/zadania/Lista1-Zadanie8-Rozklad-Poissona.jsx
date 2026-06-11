@@ -1,22 +1,23 @@
-import { useEffect, useState } from 'react';
-import { BlockMath, InlineMath } from 'react-katex';
+﻿import { useEffect, useState } from 'react';
+import { InlineMath } from 'react-katex';
 import { postJson } from '../api.js';
 
 const initialData = {
   lambdaValue: 2,
   samples: [],
+  histogram: [],
   stats: { mean: 0, variance: 0 },
-  theoreticalMean: 0.5,
-  theoreticalVariance: 0.25,
+  theoreticalMean: 2,
+  theoreticalVariance: 2,
   modulus: 0,
   lValue: 0,
 };
 
-export default function Lista2InverseCdf({ theme }) {
+export default function Lista1Poisson({ theme }) {
   const [params, setParams] = useState({
-    k: 536870912,
-    a: 1103515245,
-    x0: 12345,
+    k: 100,
+    a: 101,
+    x0: 3,
     n: 100,
     lambda: 2,
   });
@@ -30,7 +31,7 @@ export default function Lista2InverseCdf({ theme }) {
       setError('');
 
       try {
-        const result = await postJson('/api/inverse-cdf/exponential', params, controller.signal);
+        const result = await postJson('/api/poisson', params, controller.signal);
         setData(result);
       } catch (requestError) {
         if (requestError.name !== 'AbortError') {
@@ -44,20 +45,14 @@ export default function Lista2InverseCdf({ theme }) {
     return () => controller.abort();
   }, [params]);
 
-  const maxValue = Math.max(1, ...data.samples.map((sample) => sample.value));
+  const maxCount = Math.max(1, ...data.histogram.map((item) => item.count));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <section style={cardStyle(theme)}>
-        <p style={eyebrowStyle}>Lista 2 - Zadanie 2</p>
         <h2 style={{ color: theme.header, marginTop: 0 }}>
-          Generowanie rozkładu ciągłego metodą odwracania dystrybuanty
+          Zadanie 8 Generowanie rozkładu Poissona
         </h2>
-        <p style={{ color: theme.muted, lineHeight: 1.7 }}>
-          Wartości jednostajne z LCG Lehmera są przekształcane na rozkład wykładniczy. Dla
-          dystrybuanty <InlineMath math="F(x)=1-e^{-\lambda x}" /> odwrotność ma postać:
-        </p>
-        <BlockMath math="X = F^{-1}(U) = -\frac{\ln(1-U)}{\lambda}" />
       </section>
 
       <ParamsPanel params={params} setParams={setParams} theme={theme} />
@@ -72,44 +67,40 @@ export default function Lista2InverseCdf({ theme }) {
           <ResultBox label="E(X) teoretyczne" value={data.theoreticalMean.toFixed(4)} />
           <ResultBox label="Var(X) teoretyczne" value={data.theoreticalVariance.toFixed(4)} />
         </div>
-
-        <p style={{ color: theme.muted, fontSize: 13, marginBottom: 0 }}>
-          LCG: <InlineMath math={`m=2^{${data.lValue}}=${data.modulus}`} /> | lambda ={' '}
-          {data.lambdaValue}
-        </p>
       </section>
 
       <section style={cardStyle(theme)}>
-        <h3 style={sectionTitleStyle}>Podgląd wygenerowanych wartości</h3>
-        <div style={sampleGridStyle}>
-          {data.samples.slice(0, 40).map((sample) => (
-            <div key={sample.index} style={sampleBoxStyle}>
-              <div style={{ fontSize: 11, color: '#64748b' }}>#{sample.index}</div>
-              <div style={{ fontFamily: 'monospace', color: '#065f46', fontWeight: 700 }}>
-                {sample.value.toFixed(5)}
-              </div>
-              <div style={miniTrackStyle}>
+        <h3 style={sectionTitleStyle}>Histogram wartości</h3>
+        <div style={histogramScrollStyle}>
+          <div style={verticalHistogramStyle}>
+          {data.histogram.map((item) => (
+            <div key={item.value} style={columnStyle}>
+              <span style={columnCountStyle}>{item.count}</span>
+              <div style={columnTrackStyle}>
                 <div
                   style={{
-                    ...miniFillStyle,
-                    width: `${(sample.value / maxValue) * 100}%`,
+                    ...columnFillStyle,
+                    height: `${Math.max(6, (item.count / maxCount) * 100)}%`,
                   }}
                 />
               </div>
+              <span style={columnLabelStyle}>{item.value}</span>
             </div>
           ))}
+          </div>
         </div>
       </section>
 
       <section style={cardStyle(theme)}>
-        <h3 style={sectionTitleStyle}>Tabela próbek</h3>
+        <h3 style={sectionTitleStyle}>Pierwsze próbki</h3>
         <div style={{ overflowX: 'auto' }}>
           <table style={tableStyle}>
             <thead>
               <tr>
                 <th style={cellStyle}>i</th>
                 <th style={cellStyle}>U_i</th>
-                <th style={cellStyle}>X_i = F^-1(U_i)</th>
+                <th style={cellStyle}>X_i</th>
+                <th style={cellStyle}>F(X_i)</th>
               </tr>
             </thead>
             <tbody>
@@ -117,7 +108,8 @@ export default function Lista2InverseCdf({ theme }) {
                 <tr key={sample.index}>
                   <td style={cellStyle}>{sample.index}</td>
                   <td style={cellStyle}>{sample.u.toFixed(6)}</td>
-                  <td style={cellStyle}>{sample.value.toFixed(6)}</td>
+                  <td style={cellStyle}>{sample.value}</td>
+                  <td style={cellStyle}>{sample.cumulative.toFixed(6)}</td>
                 </tr>
               ))}
             </tbody>
@@ -176,14 +168,6 @@ const cardStyle = (theme) => ({
   boxShadow: '0 4px 6px -1px rgba(0,0,0,0.08)',
 });
 
-const eyebrowStyle = {
-  margin: '0 0 8px',
-  color: '#059669',
-  fontSize: '12px',
-  fontWeight: 700,
-  textTransform: 'uppercase',
-};
-
 const sectionTitleStyle = {
   marginTop: 0,
   marginBottom: 14,
@@ -217,30 +201,57 @@ const resultBoxStyle = {
   padding: 14,
 };
 
-const sampleGridStyle = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
-  gap: 10,
+const histogramScrollStyle = {
+  overflowX: 'auto',
+  paddingTop: 8,
 };
 
-const sampleBoxStyle = {
-  background: '#f8fafc',
-  border: '1px solid #e2e8f0',
-  borderRadius: 8,
-  padding: 10,
+const verticalHistogramStyle = {
+  minWidth: 520,
+  height: 260,
+  display: 'flex',
+  alignItems: 'flex-end',
+  gap: 12,
+  padding: '8px 8px 0',
+  borderBottom: '1px solid #cbd5e1',
 };
 
-const miniTrackStyle = {
-  height: 5,
-  background: '#ecfdf5',
-  borderRadius: 999,
-  overflow: 'hidden',
-  marginTop: 8,
-};
-
-const miniFillStyle = {
+const columnStyle = {
+  flex: '1 0 38px',
   height: '100%',
+  display: 'grid',
+  gridTemplateRows: '24px 1fr 28px',
+  alignItems: 'end',
+  justifyItems: 'center',
+};
+
+const columnCountStyle = {
+  fontFamily: 'monospace',
+  fontSize: 12,
+  fontWeight: 700,
+  color: '#475569',
+};
+
+const columnTrackStyle = {
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'flex-end',
+  justifyContent: 'center',
+};
+
+const columnFillStyle = {
+  width: '100%',
+  maxWidth: 48,
   background: '#10b981',
+  borderRadius: '6px 6px 0 0',
+  transition: 'height 160ms ease',
+};
+
+const columnLabelStyle = {
+  fontFamily: 'monospace',
+  fontWeight: 700,
+  color: '#0f172a',
 };
 
 const tableStyle = {

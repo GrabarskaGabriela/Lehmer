@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-import Zadanie1 from './prezentacja/LehmerLCG.jsx';
+import AlgorytmLehmera from './prezentacja/LehmerLCG.jsx';
 import Zadanie2 from './prezentacja/VonNeumannMiddleSquare.jsx';
 
 import Lista0 from './zadania/Lista0-Zadanie9.jsx';
-import Zadanie3 from './zadania/Lista1-Zadanie8-Poisson.jsx';
-import Zadanie4 from './zadania/Lista2-Zadanie-3-Metody-Odwracania-Dystrybuanty.jsx';
+import Zadanie3 from './zadania/Lista1-Zadanie8-Rozklad-Poissona.jsx';
+import Zadanie4 from './zadania/Lista2-Zadanie-4-Proces-Poissona.jsx';
 
 const theme = {
   primary: '#10b981',
@@ -21,10 +21,10 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('zad1');
 
   const [params, setParams] = useState({
-    k: 536870912,
-    a: 1103515245,
-    x0: 12345,
-    n: 1200,
+    k: 100,
+    a: 101,
+    x0: 3,
+    n: 100,
   });
 
   const navItemStyle = (id) => ({
@@ -107,7 +107,7 @@ export default function App() {
             animation: 'fadeIn 0.3s ease-in',
           }}
         >
-          {activeTab === 'zad1' && <Zadanie1 params={params} setParams={setParams} theme={theme} />}
+          {activeTab === 'zad1' && <AlgorytmLehmera params={params} setParams={setParams} theme={theme} />}
 
           {activeTab === 'zad2' && <Zadanie2 theme={theme} />}
 

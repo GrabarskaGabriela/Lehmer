@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
-export default function LehmerParamsPanel({ params, setParams, theme }) {
-  const [draft, setDraft] = useState(params);
+export default function LehmerParamsPanel({ parametry, ustawParametry, theme }) {
+  const [szkic, ustawSzkic] = useState(parametry);
 
-  const handleChange = (e) => {
+  const obsluzZmiane = (e) => {
     const { name, value } = e.target;
-    setDraft((prev) => ({ ...prev, [name]: Number(value) }));
+    ustawSzkic((poprzedni) => ({ ...poprzedni, [name]: Number(value) }));
   };
 
-  const handleApply = () => {
-    setParams(draft);
+  const zastosujParametry = () => {
+    ustawParametry(szkic);
   };
 
   const fieldStyle = {
@@ -85,15 +85,6 @@ export default function LehmerParamsPanel({ params, setParams, theme }) {
           >
             Parametry generatora Lehmera
           </div>
-          <div
-            style={{
-              fontSize: 12,
-              color: theme.muted,
-              marginTop: 3,
-            }}
-          >
-            Generator LCG (Liniowy Generator Kongruentny)
-          </div>
         </div>
 
         <div
@@ -109,8 +100,8 @@ export default function LehmerParamsPanel({ params, setParams, theme }) {
             <input
               type="number"
               name="k"
-              value={draft.k}
-              onChange={handleChange}
+              value={szkic.k}
+              onChange={obsluzZmiane}
               style={inputStyle}
             />
           </div>
@@ -120,8 +111,8 @@ export default function LehmerParamsPanel({ params, setParams, theme }) {
             <input
               type="number"
               name="a"
-              value={draft.a}
-              onChange={handleChange}
+              value={szkic.a}
+              onChange={obsluzZmiane}
               style={inputStyle}
             />
           </div>
@@ -131,8 +122,8 @@ export default function LehmerParamsPanel({ params, setParams, theme }) {
             <input
               type="number"
               name="x0"
-              value={draft.x0}
-              onChange={handleChange}
+              value={szkic.x0}
+              onChange={obsluzZmiane}
               style={inputStyle}
             />
           </div>
@@ -142,14 +133,14 @@ export default function LehmerParamsPanel({ params, setParams, theme }) {
             <input
               type="number"
               name="n"
-              value={draft.n}
-              onChange={handleChange}
+              value={szkic.n}
+              onChange={obsluzZmiane}
               style={inputStyle}
             />
           </div>
 
-          <button style={buttonStyle} onClick={handleApply}>
-            ▶ Generuj
+          <button style={buttonStyle} onClick={zastosujParametry}>
+            Generuj
           </button>
         </div>
       </div>
